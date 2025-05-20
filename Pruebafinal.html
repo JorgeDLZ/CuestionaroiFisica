@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cuestionario Interactivo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #cce6ff;
+      color: #333;
+      text-align: center;
+    }
+    .question {
+      margin-bottom: 20px;
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .hidden {
+      display: none;
+    }
+    button {
+      background-color: white;
+      color: #007BFF;
+      border: none;
+      padding: 10px 25px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin: 10px;
+    }
+    button:hover {
+      background-color: #007BFF;
+      color: white;
+    }
+    select {
+      font-size: 16px;
+      padding: 8px 12px;
+      border-radius: 5px;
+      border: 1px solid #007BFF;
+      margin-bottom: 10px;
+      width: 250px;
+    }
+    h1 {
+      margin-bottom: 15px;
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #007BFF;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 80%;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #007BFF;
+    }
+    th {
+      background-color: #007BFF;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Selecciona tu nombre</h1>
+  <select id="studentSelect">
+    <option value="">-- Selecciona --</option>
+  </select>
+  <br />
+  <button onclick="startQuiz()">Iniciar Cuestionario</button>
+  <button onclick="showRanking()">Tabla de Posiciones</button>
+  <button onclick="resetProgress()">Reiniciar Progreso</button>
+
+  <div id="quiz" class="hidden"></div>
+  <div id="result"></div>
+  <div id="ranking" class="hidden">
+    <h2>Tabla de Posiciones</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Cédula</th>
+          <th>Puntaje</th>
+        </tr>
+      </thead>
+      <tbody id="rankingBody"></tbody>
+    </table>
+    <button onclick="goBack()">Volver</button>
+  </div>
+
+  <script>
+    const students = [
+      "MANUEL EDUARDO ALARCON AZA 1073482106",
+      "JULIAN MATEO ALARCON RAMIREZ 1073600736",
+      "HAILIN YULIANA ALGARRA LARA 1076241672",
+      "JHOSMAN FELIPE ALVARADO MORALES 1072643944",
+      "CAROL VANESA ANGULO TRIANA 1033098801",
+      "TANIA LORENA BELTRAN LARA 1000256642",
+      "NICOLÁS CANASTERO RESTREPO 1070007615",
+      "MARIA CELESTE CARDENAS BELTRAN 1070008211",
+      "NICOLAS CAJAMARCA TORRES 1094896185",
+      "SAMUEL CASTELLANOS RIVERA 1053331373",
+      "KAREN JULIANA CASTILLO BARRETO 1072649183",
+      "GABRIEL STIVENS CHAVEZ CASTRO 1078346761",
+      "JUAN DIEGO CIFUENTES RODRIGUEZ 1072649677",
+      "MANUEL EDUARDO CORTES MARCELO 1027151480",
+      "JORGE ALCIDES DIAZ LOZANO 1013263461",
+      "CRISTIAN ANDRES GALEANO POVEDA 1070023677",
+      "PEDRO JOSE GARCIA CORREA 1072643327",
+      "DIEGO ALEJANDRO GARCIA OLAYA 1071328518",
+      "JHON SEBASTIAN GARNICA NIETO 1031805932",
+      "BRAYAN ANDRES GARZON ALMONACID 1072646390",
+      "JUAN JOSÉ GRACIA GOMEZ 1075653914",
+      "RONALD FELIPE GUAYAMBUCO MUÑOZ 1023082721",
+      "LAURA DANIELA HOYOS GORDILLO 1072653232",
+      "MARIANA LEÓN TRIANA 1031809345",
+      "JESUS SANTIAGO LOZANO PEÑA 1013263816",
+      "FABIAN GUILLERMO MELENDEZ GAITÁN 1013259710",
+      "SERGIO STEEVEN MORENO FORERO 1076241868",
+      "LIZETH VANESSA MORENO MORENO 1033099768",
+      "DAVID ANDRES PINZON CORREA 1072647998",
+      "BRAYAN ESTEBAN PINZON TORRES 1056482428",
+      "MONICA YULIHET POVEDA CARRASCO 1072648760",
+      "TOMAS POVEDA TRUJILLO 1014661030",
+      "MARIA PAULA RAMIREZ GOMEZ 1016950460",
+      "JUAN SEBASTIÁN RODRÍGUEZ BLANCO 1025534328",
+      "JUAN DAVID RUGE GARZON 1072647795",
+      "DANIEL CAMILO RUIZ RODRIGUEZ 1076739226",
+      "KEVIN SANTIAGO SANCHEZ QUITIAN 1130384023",
+      "JONATHAN ALEJANDRO 1072645629"
+    ];
+
+    const questions = [
+      { q: "¿Qué establece la ley de Hooke sobre la fuerza ejercida por un resorte?", options: ["A) La fuerza es inversamente proporcional a la elongación", "B) La fuerza no depende de la deformación", "C) La fuerza es directamente proporcional a la deformación", "D) La fuerza depende del tiempo"], correct: 2 },
+      { q: "¿Qué relación existe entre la constante del resorte (k) y la rigidez del mismo?", options: ["A) A menor k, mayor rigidez", "B) A mayor k, menor rigidez", "C) A mayor k, mayor rigidez", "D) k no influye en la rigidez"], correct: 2 },
+      { q: "¿Qué factores afectan el período de oscilación de un péndulo simple?", options: ["A) Masa y longitud", "B) Masa y amplitud", "C) Longitud y gravedad", "D) Amplitud y frecuencia"], correct: 2 },
+      { q: "¿Cómo se calcula el período de un resorte que oscila verticalmente?", options: ["A) T=2π √k/m", "B) T=2π √m/k", "C) T=k/m", "D) T=1/2π √m/k"], correct: 1 },
+      { q: "¿Qué diferencia hay entre un movimiento armónico simple y uno amortiguado?", options: ["A) El armónico pierde energía, el amortiguado no", "B) El amortiguado no tiene oscilaciones", "C) El armónico mantiene su energía, el amortiguado la pierde", "D) Ambos son exactamente iguales"], correct: 2 },
+      { q: "¿Cuál es la fórmula de la ley de gravitación universal de Newton?", options: ["A) F=G*m1*r", "B) F=G*m1*m2/r2", "C) F=G/m1*m2*r", "D) F=m*g"], correct: 1 },
+      { q: "¿Cómo varía la fuerza gravitacional entre dos cuerpos si duplicamos la distancia entre ellos?", options: ["A) Se duplica", "B) Se mantiene igual", "C) Se reduce a la mitad", "D) Se reduce a la cuarta parte"], correct: 3 },
+      { q: "¿Qué diferencia hay entre ondas mecánicas y electromagnéticas?", options: ["A) Ambas necesitan un medio para propagarse", "B) Las electromagnéticas no necesitan medio; las mecánicas sí", "C) Las mecánicas viajan en el vacío", "D) Las mecánicas son siempre transversales"], correct: 1 },
+      { q: "¿Qué relación existe entre la frecuencia, la longitud de onda y la velocidad de una onda?", options: ["A) V=F+λ", "B) V=F/λ", "C) V=F*λ", "D) V=λ^2*F"], correct: 2 },
+      { q: "¿Qué es una onda transversal?", options: ["A) La dirección de oscilación es paralela a la propagación", "B) No necesita un medio para propagarse", "C) La vibración es perpendicular a la dirección de propagación", "D) Solo se presenta en líquidos"], correct: 2 }
+    ];
+
+    students.forEach(name => {
+      const option = document.createElement("option");
+      option.textContent = name;
+      option.value = name;
+      document.getElementById("studentSelect").appendChild(option);
+    });
+
+    function startQuiz() {
+      const selected = document.getElementById("studentSelect").value;
+      if (!selected) return alert("Selecciona un estudiante");
+
+      if (localStorage.getItem(`quizAnswered_${selected}`)) {
+        alert("Este usuario ya respondió el cuestionario.");
+        return;
+      }
+
+      const quizDiv = document.getElementById("quiz");
+      quizDiv.innerHTML = `<h2>Cuestionario para: ${selected}</h2>`;
+
+      const selectedQuestions = [...questions].sort(() => Math.random() - 0.5).slice(0, 5);
+
+      selectedQuestions.forEach((q, i) => {
+        const qDiv = document.createElement("div");
+        qDiv.className = "question";
+        qDiv.innerHTML = `<p><b>${i + 1}. ${q.q}</b></p>` +
+          q.options.map((opt, idx) => `<label><input type="radio" name="q${i}" value="${idx}"> ${opt}</label><br>`).join("");
+        quizDiv.appendChild(qDiv);
+      });
+
+      const submitBtn = document.createElement("button");
+      submitBtn.textContent = "Enviar respuestas";
+      submitBtn.onclick = () => checkAnswers(selectedQuestions, selected);
+      quizDiv.appendChild(submitBtn);
+
+      document.getElementById("result").textContent = "";
+      quizDiv.classList.remove("hidden");
+      document.getElementById("ranking").classList.add("hidden");
+    }
+
+    function checkAnswers(selectedQuestions, user) {
+      let score = 0;
+      for (let i = 0; i < selectedQuestions.length; i++) {
+        const radios = document.getElementsByName(`q${i}`);
+        for (const radio of radios) {
+          if (radio.checked && parseInt(radio.value) === selectedQuestions[i].correct) {
+            score++;
+            break;
+          }
+        }
+      }
+
+      localStorage.setItem(`quizAnswered_${user}`, "true");
+      localStorage.setItem(`quizScore_${user}`, score);
+
+      document.getElementById("quiz").innerHTML = `<h2>Gracias por responder, ${user}.</h2><p>Tu puntaje fue: ${score} / ${selectedQuestions.length}</p>`;
+      document.getElementById("result").textContent = `Puntaje: ${score} / ${selectedQuestions.length}`;
+    }
+
+    function showRanking() {
+      const tbody = document.getElementById("rankingBody");
+      tbody.innerHTML = "";
+
+      students.forEach(fullname => {
+        if (localStorage.getItem(`quizAnswered_${fullname}`)) {
+          const score = localStorage.getItem(`quizScore_${fullname}`);
+          const parts = fullname.split(" ");
+          const cedula = parts[parts.length - 1];
+          const nombre = parts.slice(0, parts.length - 1).join(" ");
+
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${nombre}</td><td>${cedula}</td><td>${score}</td>`;
+          tbody.appendChild(row);
+        }
+      });
+
+      document.getElementById("quiz").classList.add("hidden");
+      document.getElementById("ranking").classList.remove("hidden");
+      document.getElementById("result").textContent = "";
+    }
+
+    function goBack() {
+      document.getElementById("ranking").classList.add("hidden");
+      document.getElementById("quiz").classList.add("hidden");
+      document.getElementById("result").textContent = "";
+    }
+
+    function resetProgress() {
+      const pwd = prompt("Ingrese la contraseña para reiniciar el progreso:");
+      if (pwd === "56789") {
+        // Borra solo las claves relacionadas al quiz
+        students.forEach(name => {
+          localStorage.removeItem(`quizAnswered_${name}`);
+          localStorage.removeItem(`quizScore_${name}`);
+        });
+        alert("Progreso reiniciado correctamente.");
+        location.reload();
+      } else {
+        alert("Contraseña incorrecta. No se reinició el progreso.");
+      }
+    }
+  </script>
+</body>
+</html>
